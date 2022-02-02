@@ -1,0 +1,2 @@
+/* There is no need for anything in this specific build.gradle as all
+subprojects have their own build.gradle files with their own dependencies*/

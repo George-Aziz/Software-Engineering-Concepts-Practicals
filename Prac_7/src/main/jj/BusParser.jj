@@ -1,0 +1,107 @@
+/****************************************************
+ * Author: George Aziz
+ * Purpose: BusParser .jj file to parse bus details
+ * Date Last Modified: 01/10/2021
+ ***************************************************/
+PARSER_BEGIN(BusParser)
+package edu.curtin.comp3003.prac7;
+public class BusParser
+{
+}
+PARSER_END(BusParser)
+
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+  < START: "bus" > |
+  < LBRACKET: "(" > |
+  < RBRACKET: ")" > |
+  < NUMBER: ( ["0"-"9"] )+ > |
+  < ARROW: "->" > |
+  < BUSNAME: "\"" (~["\""])* "\"" > |
+  < HOUR: ["0"-"2"]["0"-"3"] | ["0"-"1"]["0"-"9"] | ["0"-"9"] > |
+  < MINUTE: ["0"-"5"]["0"-"9"] | ["0"-"9"] > |
+  < TIME: <HOUR> ":" <MINUTE> > |
+  < FREE: "free" >
+}
+
+/** Top level production. */
+void Input() :
+{
+    Token busNum;
+    Token busName;
+    Token time;
+    Token stop;
+    String times = "";
+    String stops = "";
+    int curBusAmt = 1;
+}
+{
+    (
+        <START> <LBRACKET> busNum = <NUMBER> <RBRACKET> //bus(Number) Number is the bus number
+        {
+            System.out.println("[" + curBusAmt + "]"); //For each new bus, prints the counter
+            System.out.println("Bus Number: " + busNum.image); //Prints the bus number retrieved
+        }
+
+        <ARROW> busName = <BUSNAME> //-> "BusName" ("BusName" is the whole busname including quotes)
+        {
+            System.out.println("Bus Name: " + busName.image);
+        }
+        "at"
+        (
+            time = <TIME>
+            {
+                //Adds all the times into one string separated with space
+                times += time.image + " ";
+            }
+        )+
+        {
+            //Only prints this if there is 1 or more time tokens
+            System.out.println("Bus Times: " + times);
+            times = ""; //For next line execution
+        }
+
+        "via" "stops"
+        (
+            stop = <NUMBER> //There must be one Stop Number
+            {
+                stops = stop.image + " ";
+            }
+            (
+                stop = <NUMBER>
+                {
+                    stops += stop.image + " ";
+                }
+            )+ //Ensures a total of 2 stop numbers before printing
+        )+
+        {
+            System.out.println("Bus stops: " + stops);
+            stops = ""; //For next line execution
+        }
+
+        (
+            <FREE>
+            {
+                System.out.println("Bus is free\n");
+                curBusAmt++; //For next bus if there is any
+            }
+        | //This acts as an IF ELSE statement
+            {
+                System.out.println("Bus is not free\n");
+                curBusAmt++; //For next bus if there is any
+            }
+        )
+
+    )*
+    <EOF>
+}
+

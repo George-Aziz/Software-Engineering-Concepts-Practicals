@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories
+{
+    jcenter()
+}
+
+run {
+    standardInput = System.in
+}
+
+sourceCompatibility = '11.0'
+
+compileJava {
+    options.compilerArgs << '-Xlint:unchecked'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'edu.curtin.comp3003.api.Reflection'
+    }
+}
+
+application {
+    mainClassName = 'edu.curtin.comp3003.api.Reflection'
+}
+
